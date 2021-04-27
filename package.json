@@ -1,0 +1,8 @@
+{
+  "name": "api-monitoring",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:tareqmahmud/api-monitoring.git",
+  "author": "MD Tareq Mahmud <tareqmahmud9@gmail.com>",
+  "license": "MIT"
+}
