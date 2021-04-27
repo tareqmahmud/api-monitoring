@@ -4,5 +4,8 @@
   "main": "index.js",
   "repository": "git@github.com:tareqmahmud/api-monitoring.git",
   "author": "MD Tareq Mahmud <tareqmahmud9@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
 }
