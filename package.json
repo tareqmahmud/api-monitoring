@@ -5,7 +5,11 @@
   "repository": "git@github.com:tareqmahmud/api-monitoring.git",
   "author": "MD Tareq Mahmud <tareqmahmud9@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "dev": "nodemon app.js"
+  },
   "devDependencies": {
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.7",
+    "prettier": "^2.2.1"
   }
 }
