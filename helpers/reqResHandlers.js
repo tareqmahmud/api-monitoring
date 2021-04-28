@@ -1,6 +1,7 @@
 const {StringDecoder} = require('string_decoder');
 const routes = require('../routes');
 const notFoundController = require('../controllers/notFoundController');
+const libData = require('../lib/data');
 
 const handlers = {};
 
@@ -53,6 +54,11 @@ handlers.reqResHandlers = (req, res) => {
             const generateStatusCode = typeof (statusCode) === 'number' ? statusCode : 500;
             const generatePayload = typeof (payload) === 'object' ? payload : {};
             const payloadString = JSON.stringify(generatePayload);
+
+            // Temporary write to the file
+            libData.delete('test', 'newFile', (err, message) => {
+                console.log(err, message);
+            });
 
             // Return response status code as header
             res.writeHead(generateStatusCode);
