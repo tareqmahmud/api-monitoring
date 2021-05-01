@@ -167,6 +167,89 @@ controller._check.get = (req, callback) => {
 
 // Put method
 controller._check.put = (req, callback) => {
+    // Get the checkId
+    const checkId = typeof (req.body.id) === 'string' && req.body.id.trim().length === 20 ? req.body.id : false;
+
+    // Validate the input data
+    /**
+     * Input Data
+     * - protocol -> string in [http, https]
+     * - url -> string
+     * - method -> [GET, POST, PUT, DELETE]
+     * - successCode -> [200, 201],
+     * - timeoutSeconds -> number
+     **/
+    const protocol = typeof (req.body.protocol) === 'string' && ['http', 'https'].indexOf(req.body.protocol) > -1 ? req.body.protocol : false;
+    const url = typeof (req.body.url) === 'string' && req.body.url.trim().length > 0 ? req.body.url : false;
+    const method = typeof (req.body.method) === 'string' && ['GET', 'POST', 'PUT', 'DELETE'].indexOf(req.body.method) > -1 ? req.body.method : false;
+    const successCode = typeof (req.body.successCode) === 'object' && req.body.successCode instanceof Array ? req.body.successCode : false;
+    const timeoutSeconds = typeof (req.body.timeoutSeconds) === 'number' && req.body.timeoutSeconds % 1 === 0 && req.body.timeoutSeconds >= 1 && req.body.timeoutSeconds <= 5 ? req.body.timeoutSeconds : false;
+
+
+    if (checkId) {
+        if (protocol || url || method || successCode || timeoutSeconds) {
+            // Retrieve the existing checked data
+            libData.read('checks', checkId, (err, checkData) => {
+                if (!err && checkData) {
+                    const authToken = req.headersObject.token;
+                    verifyToken(authToken, utilities.parseJson(checkData).userPhone, (authenticated) => {
+                        if (authenticated) {
+                            const checkObj = {...utilities.parseJson(checkData)};
+
+                            if (protocol) {
+                                checkObj.protocol = protocol;
+                            }
+
+                            if (url) {
+                                checkObj.url = url;
+                            }
+
+                            if (method) {
+                                checkObj.method = method;
+                            }
+
+                            if (successCode) {
+                                checkObj.successCode = successCode;
+                            }
+
+                            if (timeoutSeconds) {
+                                checkObj.timeoutSeconds = timeoutSeconds;
+                            }
+
+                            // Update the checked data
+                            libData.update('checks', checkId, checkObj, (err) => {
+                                if (!err) {
+                                    callback(200, {
+                                        message: 'The checks api updated successfully'
+                                    });
+                                } else {
+                                    callback(500, {
+                                        error: 'Internal server error!'
+                                    })
+                                }
+                            })
+                        } else {
+                            callback(403, {
+                                error: 'Unauthorized Access!'
+                            })
+                        }
+                    })
+                } else {
+                    callback(404, {
+                        error: 'Not Found!'
+                    })
+                }
+            })
+        } else {
+            callback(400, {
+                error: 'Please provide all the valid data'
+            })
+        }
+    } else {
+        callback(400, {
+            error: 'Please provide all the valid data'
+        })
+    }
 
 }
 
