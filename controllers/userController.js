@@ -34,7 +34,7 @@ controller._users.get = (req, callback) => {
 
     if (phone) {
         // Verify Authentication
-        const authToken = req.headersObject.authToken;
+        const authToken = req.headersObject.token;
         verifyToken(authToken, phone, (authenticated) => {
             if (authenticated) {
                 // Check is file available or not
@@ -126,7 +126,7 @@ controller._users.put = (req, callback) => {
 
     if (phone) {
         // Verify Authentication
-        const authToken = req.headersObject.authToken;
+        const authToken = req.headersObject.token;
         verifyToken(authToken, phone, (authenticated) => {
             if (authenticated) {
 // Only update data if user at least provide one data except phone and agreement
@@ -192,7 +192,7 @@ controller._users.delete = (req, callback) => {
 
     if (phone) {
         // Verify Authentication
-        const authToken = req.headersObject.authToken;
+        const authToken = req.headersObject.token;
         verifyToken(authToken, phone, (authenticated) => {
             if (authenticated) {
                 // Check is file available or not
