@@ -134,7 +134,35 @@ controller._check.post = (req, callback) => {
 
 // Get method
 controller._check.get = (req, callback) => {
+    const checkIdParam = req.params.get('id');
+    const checkId = typeof (checkIdParam) === 'string' && checkIdParam.trim().length === 20 ? checkIdParam : false;
 
+    if (checkId) {
+        // Find out the check api object from DB
+        libData.read('checks', checkId, (err, checkData) => {
+            if (!err && checkData) {
+                const authToken = req.headersObject.token;
+
+                verifyToken(authToken, checkData.phone, (authenticated) => {
+                    if (authenticated) {
+                        callback(200, utilities.parseJson(checkData));
+                    } else {
+                        callback(403, {
+                            error: 'Unauthorized Access'
+                        })
+                    }
+                })
+            } else {
+                callback(404, {
+                    error: 'Invalid check id'
+                })
+            }
+        })
+    } else {
+        callback(400, {
+            error: 'Please provide all the valid data'
+        })
+    }
 }
 
 // Put method
