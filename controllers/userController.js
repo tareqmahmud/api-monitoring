@@ -165,7 +165,37 @@ controller._users.put = (req, callback) => {
 
 // Update method
 controller._users.delete = (req, callback) => {
+    // At first retrieve the phone number from the query
+    const phoneParam = req.params.get('phone');
+    const phone = typeof (phoneParam) === 'string' && phoneParam.trim().length === 11 ? phoneParam : false;
 
+    if (phone) {
+        // Check is file available or not
+        libData.read('users', phone, (err, user) => {
+            const userObject = {...utilities.parseJson(user)}
+            if (!err && userObject) {
+                libData.delete('users', phone, (err) => {
+                    if (!err) {
+                        callback(200, {
+                            message: 'Successfully created the user'
+                        })
+                    } else {
+                        callback(500, {
+                            error: 'Something wrong in database'
+                        })
+                    }
+                })
+            } else {
+                callback(404, {
+                    error: 'Sorry user not found!'
+                })
+            }
+        })
+    } else {
+        callback(404, {
+            error: 'Sorry user not found!'
+        })
+    }
 }
 
 module.exports = controller;
