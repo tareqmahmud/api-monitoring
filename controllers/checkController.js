@@ -143,7 +143,7 @@ controller._check.get = (req, callback) => {
             if (!err && checkData) {
                 const authToken = req.headersObject.token;
 
-                verifyToken(authToken, checkData.phone, (authenticated) => {
+                verifyToken(authToken, utilities.parseJson(checkData).userPhone, (authenticated) => {
                     if (authenticated) {
                         callback(200, utilities.parseJson(checkData));
                     } else {
@@ -255,6 +255,45 @@ controller._check.put = (req, callback) => {
 
 // Update method
 controller._check.delete = (req, callback) => {
+    const checkIdParam = req.params.get('id');
+    const checkId = typeof (checkIdParam) === 'string' && checkIdParam.trim().length === 20 ? checkIdParam : false;
+
+    if (checkId) {
+        // Find out the check api object from DB
+        libData.read('checks', checkId, (err, checkData) => {
+            if (!err && checkData) {
+                const authToken = req.headersObject.token;
+
+                verifyToken(authToken, utilities.parseJson(checkData).userPhone, (authenticated) => {
+                    if (authenticated) {
+                        libData.delete('checks', checkId, (err) => {
+                            if (!err) {
+                                callback(200, {
+                                    message: 'Successfully delete the api'
+                                })
+                            } else {
+                                callback(500, {
+                                    error: 'Something wrong in server'
+                                })
+                            }
+                        })
+                    } else {
+                        callback(403, {
+                            error: 'Unauthorized Access'
+                        })
+                    }
+                })
+            } else {
+                callback(404, {
+                    error: 'Invalid check id'
+                })
+            }
+        })
+    } else {
+        callback(400, {
+            error: 'Please provide all the valid data'
+        })
+    }
 
 }
 
