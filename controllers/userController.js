@@ -27,9 +27,31 @@ controller._users = {};
 
 // Get method
 controller._users.get = (req, callback) => {
-    return callback(200, {
-        message: 'From Get Method'
-    })
+    // At first retrieve the phone number from the query
+    const phoneParam = req.params.get('phone');
+    const phone = typeof (phoneParam) === 'string' && phoneParam.trim().length === 11 ? phoneParam : false;
+
+    if (phone) {
+        // Check is file available or not
+        libData.read('users', phone, (err, user) => {
+            const userObject = {...utilities.parseJson(user)}
+            if (!err) {
+                delete userObject.password;
+
+                callback(200, {
+                    user: userObject
+                })
+            } else {
+                callback(404, {
+                    error: 'Sorry user not found!'
+                })
+            }
+        })
+    } else {
+        callback(404, {
+            error: 'Sorry user not found!'
+        })
+    }
 }
 
 // Post method
