@@ -8,7 +8,8 @@ const environment = {};
  */
 environment.staging = {
     port: 3000,
-    environment: 'staging'
+    environment: 'staging',
+    secret: 'sdfsdfdsgrwes'
 }
 
 
@@ -19,7 +20,8 @@ environment.staging = {
  */
 environment.production = {
     port: 3000,
-    environment: 'production'
+    environment: 'production',
+    secret: 'sdifju3894789dlkdf'
 }
 
 // Generate the specific config

@@ -39,8 +39,6 @@ handlers.reqResHandlers = (req, res) => {
         // Call the specific routes
         const callRoutesHandler = routes[trimmedPath] ? routes[trimmedPath] : notFoundController;
 
-        console.log(bodyData);
-
         // Generate req parse data
         const reqObject = {
             parseUrl,
@@ -58,7 +56,7 @@ handlers.reqResHandlers = (req, res) => {
             const payloadString = JSON.stringify(generatePayload);
 
             // Return response status code as header
-            // res.setHeader('Content-Type', 'application/json');
+            res.setHeader('Content-Type', 'application/json');
             res.writeHead(generateStatusCode);
 
             // Return the payload
