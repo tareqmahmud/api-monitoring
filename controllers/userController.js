@@ -6,6 +6,7 @@
  */
 const libData = require('../lib/data');
 const utilities = require('../helpers/utilities');
+const {verify: verifyToken} = require('./tokenController')._token;
 
 const controller = {};
 
@@ -32,24 +33,34 @@ controller._users.get = (req, callback) => {
     const phone = typeof (phoneParam) === 'string' && phoneParam.trim().length === 11 ? phoneParam : false;
 
     if (phone) {
-        // Check is file available or not
-        libData.read('users', phone, (err, user) => {
-            const userObject = {...utilities.parseJson(user)}
-            if (!err) {
-                delete userObject.password;
+        // Verify Authentication
+        const authToken = req.headersObject.authToken;
+        verifyToken(authToken, phone, (authenticated) => {
+            if (authenticated) {
+                // Check is file available or not
+                libData.read('users', phone, (err, user) => {
+                    const userObject = {...utilities.parseJson(user)}
+                    if (!err) {
+                        delete userObject.password;
 
-                callback(200, {
-                    user: userObject
+                        callback(200, {
+                            user: userObject
+                        })
+                    } else {
+                        callback(404, {
+                            error: 'Sorry user not found!'
+                        })
+                    }
                 })
             } else {
-                callback(404, {
-                    error: 'Sorry user not found!'
+                callback(403, {
+                    error: 'Unauthorized Access'
                 })
             }
         })
     } else {
-        callback(404, {
-            error: 'Sorry user not found!'
+        callback(400, {
+            error: 'Please provide all the required valid field!'
         })
     }
 }
@@ -114,48 +125,58 @@ controller._users.put = (req, callback) => {
     const toAgreement = typeof (req.body.toAgreement) === 'boolean' ? req.body.toAgreement : false;
 
     if (phone) {
-        // Only update data if user at least provide one data except phone and agreement
-        if (firstName || lastName || password) {
-            libData.read('users', phone, (err, user) => {
-                if (!err) {
-                    // Retrieve existing user
-                    const userObject = {...utilities.parseJson(user)}
-
-                    // Only update userObject which is available
-                    if (firstName) {
-                        userObject.firstName = firstName;
-                    }
-
-                    if (lastName) {
-                        userObject.lastName = lastName;
-                    }
-
-                    if (password) {
-                        userObject.password = utilities.hash(password);
-                    }
-
-                    // Finally update the data
-                    libData.update('users', phone, userObject, (err, user) => {
+        // Verify Authentication
+        const authToken = req.headersObject.authToken;
+        verifyToken(authToken, phone, (authenticated) => {
+            if (authenticated) {
+// Only update data if user at least provide one data except phone and agreement
+                if (firstName || lastName || password) {
+                    libData.read('users', phone, (err, user) => {
                         if (!err) {
-                            // Return the updated user
-                            delete userObject.password;
+                            // Retrieve existing user
+                            const userObject = {...utilities.parseJson(user)}
 
-                            callback(200, {
-                                user: userObject
+                            // Only update userObject which is available
+                            if (firstName) {
+                                userObject.firstName = firstName;
+                            }
+
+                            if (lastName) {
+                                userObject.lastName = lastName;
+                            }
+
+                            if (password) {
+                                userObject.password = utilities.hash(password);
+                            }
+
+                            // Finally update the data
+                            libData.update('users', phone, userObject, (err, user) => {
+                                if (!err) {
+                                    // Return the updated user
+                                    delete userObject.password;
+
+                                    callback(200, {
+                                        user: userObject
+                                    })
+                                } else {
+                                    callback(500, {
+                                        error: 'Something wrong in server!'
+                                    })
+                                }
                             })
                         } else {
-                            callback(500, {
-                                error: 'Something wrong in server!'
+                            callback(400, {
+                                error: 'Invalid phone number'
                             })
                         }
                     })
-                } else {
-                    callback(400, {
-                        error: 'Invalid phone number'
-                    })
                 }
-            })
-        }
+            } else {
+                callback(403, {
+                    error: 'Unauthorized Access'
+                })
+            }
+        })
     } else {
         callback(400, {
             error: 'Please input all the required fields'
@@ -170,30 +191,40 @@ controller._users.delete = (req, callback) => {
     const phone = typeof (phoneParam) === 'string' && phoneParam.trim().length === 11 ? phoneParam : false;
 
     if (phone) {
-        // Check is file available or not
-        libData.read('users', phone, (err, user) => {
-            const userObject = {...utilities.parseJson(user)}
-            if (!err && userObject) {
-                libData.delete('users', phone, (err) => {
-                    if (!err) {
-                        callback(200, {
-                            message: 'Successfully created the user'
+        // Verify Authentication
+        const authToken = req.headersObject.authToken;
+        verifyToken(authToken, phone, (authenticated) => {
+            if (authenticated) {
+                // Check is file available or not
+                libData.read('users', phone, (err, user) => {
+                    const userObject = {...utilities.parseJson(user)}
+                    if (!err && userObject) {
+                        libData.delete('users', phone, (err) => {
+                            if (!err) {
+                                callback(200, {
+                                    message: 'Successfully created the user'
+                                })
+                            } else {
+                                callback(500, {
+                                    error: 'Something wrong in database'
+                                })
+                            }
                         })
                     } else {
-                        callback(500, {
-                            error: 'Something wrong in database'
+                        callback(404, {
+                            error: 'Sorry user not found!'
                         })
                     }
                 })
             } else {
-                callback(404, {
-                    error: 'Sorry user not found!'
+                callback(403, {
+                    error: 'Unauthorized Access'
                 })
             }
         })
     } else {
-        callback(404, {
-            error: 'Sorry user not found!'
+        callback(400, {
+            error: 'Please input all the required fields'
         })
     }
 }

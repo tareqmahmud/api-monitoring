@@ -183,4 +183,20 @@ controller._token.delete = (req, callback) => {
 
 }
 
+// Method for verify token
+controller._token.verify = (id, phone, callback) => {
+    libData.read('token', id, (err, tokenData) => {
+        if (!err && tokenData) {
+            const tokenObject = {...utilities.parseJson(tokenData)};
+            if (tokenObject.phone === phone && tokenObject.expireIn > Date.now()) {
+                callback(true);
+            } else {
+                callback(false);
+            }
+        } else {
+            callback(false);
+        }
+    })
+}
+
 module.exports = controller;
