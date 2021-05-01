@@ -9,7 +9,12 @@ const environment = {};
 environment.staging = {
     port: 3000,
     environment: 'staging',
-    secret: 'sdfsdfdsgrwes'
+    secret: 'sdfsdfdsgrwes',
+    twilio: {
+        fromPhone: '',
+        accountSid: '',
+        authToken: '',
+    },
 }
 
 
@@ -21,7 +26,12 @@ environment.staging = {
 environment.production = {
     port: 3000,
     environment: 'production',
-    secret: 'sdifju3894789dlkdf'
+    secret: 'sdifju3894789dlkdf',
+    twilio: {
+        fromPhone: '',
+        accountSid: '',
+        authToken: '',
+    },
 }
 
 // Generate the specific config
