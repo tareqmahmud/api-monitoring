@@ -1,7 +1,7 @@
 const {StringDecoder} = require('string_decoder');
 const routes = require('../routes');
 const notFoundController = require('../controllers/notFoundController');
-const libData = require('../lib/data');
+const {parseJson} = require('./utilities');
 
 const handlers = {};
 
@@ -39,14 +39,16 @@ handlers.reqResHandlers = (req, res) => {
         // Call the specific routes
         const callRoutesHandler = routes[trimmedPath] ? routes[trimmedPath] : notFoundController;
 
+        console.log(bodyData);
+
         // Generate req parse data
         const reqObject = {
             parseUrl,
             trimmedPath,
             method,
-            queryParams,
+            params: queryParams,
             headersObject,
-            bodyData
+            body: parseJson(bodyData)
         };
 
         // Call the routes handler -> controller
