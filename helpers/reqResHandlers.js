@@ -55,12 +55,8 @@ handlers.reqResHandlers = (req, res) => {
             const generatePayload = typeof (payload) === 'object' ? payload : {};
             const payloadString = JSON.stringify(generatePayload);
 
-            // Temporary write to the file
-            libData.delete('test', 'newFile', (err, message) => {
-                console.log(err, message);
-            });
-
             // Return response status code as header
+            res.setHeader('Content-Type', 'application/json');
             res.writeHead(generateStatusCode);
 
             // Return the payload
