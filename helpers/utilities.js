@@ -35,5 +35,30 @@ utilities.hash = (str) => {
     return false;
 }
 
+/**
+ * Method to create random string based on length
+ *
+ * @param strLength
+ * @returns {string}
+ */
+utilities.createRandomString = (strLength) => {
+    // validate strLength
+    const generateStrLength = typeof (strLength) === 'number' ? strLength : false;
+
+    // All characters to create random string
+    const allCharacters = 'abcdefghijklmnopqrstubwxyz0123456789';
+
+    let output = '';
+
+    // Loop from beginning to strLength
+    for (let i = 1; i <= generateStrLength; i++) {
+        let randomIndex = Math.floor(Math.random() * 20);
+        let selectedCharacter = allCharacters.charAt(randomIndex);
+
+        output += selectedCharacter;
+    }
+
+    return output;
+}
 
 module.exports = utilities;
